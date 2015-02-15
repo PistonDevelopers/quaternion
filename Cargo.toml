@@ -1,0 +1,19 @@
+[package]
+
+name = "quaternion"
+version = "0.0.0"
+authors = [
+    "bvssvni <bvssvni@gmail.com>"
+]
+keywords = ["quaternion", "math", "piston"]
+description = "A simple and type agnostic quaternion math designed for reexporting"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/PistonDevelopers/quaternion.git"
+homepage = "https://github.com/PistonDevelopers/quaternion"
+
+[lib]
+
+name = "quaternion"
+path = "src/lib.rs"
+
