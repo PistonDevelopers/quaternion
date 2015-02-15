@@ -34,3 +34,9 @@ pub fn mul<T: Float + Copy>(
     [scalar, vector[0], vector[1], vector[2]]
 }
 
+/// Takes the quaternion conjugate.
+#[inline(always)]
+pub fn conj<T: Float>(a: Quaternion<T>) -> Quaternion<T> {
+    [a[0], -a[1], -a[2], -a[3]]
+}
+
