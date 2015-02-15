@@ -1,6 +1,6 @@
 #![deny(missing_docs)]
 
-//! A simple and type agnostic quaternion math designed for reexporting
+//! A simple and type agnostic quaternion math library designed for reexporting
 
 extern crate vecmath;
 

@@ -1,12 +1,12 @@
 [package]
 
 name = "quaternion"
-version = "0.0.0"
+version = "0.0.1"
 authors = [
     "bvssvni <bvssvni@gmail.com>"
 ]
 keywords = ["quaternion", "math", "piston"]
-description = "A simple and type agnostic quaternion math designed for reexporting"
+description = "A simple and type agnostic quaternion math library designed for reexporting"
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/PistonDevelopers/quaternion.git"
