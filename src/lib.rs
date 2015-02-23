@@ -12,7 +12,7 @@ pub type Quaternion<T> = (T, [T; 3]);
 
 /// Constructs identity quaternion.
 #[inline(always)]
-pub fn quaternion_id<T: Float + Copy>() -> Quaternion<T> {
+pub fn id<T: Float + Copy>() -> Quaternion<T> {
     let one = Float::one();
     let zero = Float::zero();
     (one, [zero, zero, zero])
@@ -58,15 +58,15 @@ pub fn conj<T: Float>(a: Quaternion<T>) -> Quaternion<T> {
 
 /// Computes the square length of a quaternion.
 #[inline(always)]
-pub fn quaternion_square_len<T: Float>(q: Quaternion<T>) -> T {
+pub fn square_len<T: Float>(q: Quaternion<T>) -> T {
     use vecmath::vec3_square_len as square_len;
     q.0 * q.0 + square_len(q.1)
 }
 
 /// Computes the length of a quaternion.
 #[inline(always)]
-pub fn quaternion_len<T: Float>(q: Quaternion<T>) -> T {
-    quaternion_square_len(q).sqrt()
+pub fn len<T: Float>(q: Quaternion<T>) -> T {
+    square_len(q).sqrt()
 }
 
 /// Rotate the given vector using the given quaternion
@@ -80,7 +80,7 @@ pub fn rotate_vector<T: Float>(q: Quaternion<T>, v: Vector3<T>) -> Vector3<T> {
 
 /// Construct a quaternion representing the given euler angle rotations (in radians)
 #[inline(always)]
-pub fn quaternion_from_euler_angles<T: Float + FromPrimitive>(x: T, y: T, z: T) -> Quaternion<T> {
+pub fn euler_angles<T: Float + FromPrimitive>(x: T, y: T, z: T) -> Quaternion<T> {
     let two: T = FromPrimitive::from_int(2).unwrap();
 
     let half_x = x / two;
@@ -109,7 +109,7 @@ pub fn quaternion_from_euler_angles<T: Float + FromPrimitive>(x: T, y: T, z: T) 
 /// about the given axis.
 /// Axis must be a unit vector.
 #[inline(always)]
-pub fn quaternion_from_axis_angle<T: Float + FromPrimitive>(axis: Vector3<T>, angle: T) -> Quaternion<T> {
+pub fn axis_angle<T: Float + FromPrimitive>(axis: Vector3<T>, angle: T) -> Quaternion<T> {
     use vecmath::vec3_scale as scale;
     let two: T = FromPrimitive::from_int(2).unwrap();
     let half_angle = angle / two;
@@ -122,33 +122,33 @@ pub fn quaternion_from_axis_angle<T: Float + FromPrimitive>(axis: Vector3<T>, an
 static EPSILON: f32 = 0.000001;
 
 #[test]
-fn test_quaternion_from_axis_angle() {
+fn test_axis_angle() {
     use vecmath::vec3_normalized as normalized;
     let axis: Vector3<f32> = [1.0, 1.0, 1.0];
-    let q: Quaternion<f32> = quaternion_from_axis_angle(
+    let q: Quaternion<f32> = axis_angle(
         normalized(axis),
         std::f32::consts::PI
     );
 
     // Should be a unit quaternion
-    assert!((quaternion_square_len(q) - 1.0).abs() < EPSILON);
+    assert!((square_len(q) - 1.0).abs() < EPSILON);
 }
 
 #[test]
-fn test_quaternion_from_euler_angle() {
-    let q: Quaternion<f32> = quaternion_from_euler_angles(
+fn test_euler_angle() {
+    let q: Quaternion<f32> = euler_angles(
         std::f32::consts::PI,
         std::f32::consts::PI,
         std::f32::consts::PI
     );
     // Should be a unit quaternion
-    assert!((quaternion_square_len(q) - 1.0).abs() < EPSILON);
+    assert!((square_len(q) - 1.0).abs() < EPSILON);
 }
 
 #[test]
 fn test_rotate_vector_axis_angle() {
     let v: Vector3<f32> = [1.0, 1.0, 1.0];
-    let q: Quaternion<f32> = quaternion_from_axis_angle([0.0, 1.0, 0.0], std::f32::consts::PI);
+    let q: Quaternion<f32> = axis_angle([0.0, 1.0, 0.0], std::f32::consts::PI);
     let rotated = rotate_vector(q, v);
     assert!((rotated[0] - -1.0).abs() < EPSILON);
     assert!((rotated[1] - 1.0).abs() < EPSILON);
@@ -158,7 +158,7 @@ fn test_rotate_vector_axis_angle() {
 #[test]
 fn test_rotate_vector_euler_angle() {
     let v: Vector3<f32> = [1.0, 1.0, 1.0];
-    let q: Quaternion<f32> = quaternion_from_euler_angles(0.0, std::f32::consts::PI, 0.0);
+    let q: Quaternion<f32> = euler_angles(0.0, std::f32::consts::PI, 0.0);
     let rotated = rotate_vector(q, v);
     assert!((rotated[0] - -1.0).abs() < EPSILON);
     assert!((rotated[1] - 1.0).abs() < EPSILON);
@@ -173,7 +173,7 @@ fn test_rotate_vector_axis_angle_same_axis() {
     let v: Vector3<f32> = [1.0, 1.0, 1.0];
     let arbitrary_angle = 32.12f32;
     let axis: Vector3<f32> = [1.0, 1.0, 1.0];
-    let q: Quaternion<f32> = quaternion_from_axis_angle(
+    let q: Quaternion<f32> = axis_angle(
         normalized(axis),
         arbitrary_angle
     );
