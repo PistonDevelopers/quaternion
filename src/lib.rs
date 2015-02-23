@@ -116,71 +116,74 @@ pub fn axis_angle<T: Float + FromPrimitive>(axis: Vector3<T>, angle: T) -> Quate
     (half_angle.cos(), scale(axis, half_angle.sin()))
 }
 
+
 /// Tests
+#[cfg(test)]
+mod test {
+    use super::*;
+    use vecmath::Vector3;
+    use std::f32::consts::PI;
+    use std::num::Float;
 
-/// Fudge factor for float equality checks
-static EPSILON: f32 = 0.000001;
+    /// Fudge factor for float equality checks
+    static EPSILON: f32 = 0.000001;
 
-#[test]
-fn test_axis_angle() {
-    use vecmath::vec3_normalized as normalized;
-    let axis: Vector3<f32> = [1.0, 1.0, 1.0];
-    let q: Quaternion<f32> = axis_angle(
-        normalized(axis),
-        std::f32::consts::PI
-    );
+    #[test]
+    fn test_axis_angle() {
+        use vecmath::vec3_normalized as normalized;
+        let axis: Vector3<f32> = [1.0, 1.0, 1.0];
+        let q: Quaternion<f32> = axis_angle(
+            normalized(axis),
+            PI
+        );
 
-    // Should be a unit quaternion
-    assert!((square_len(q) - 1.0).abs() < EPSILON);
+        // Should be a unit quaternion
+        assert!((square_len(q) - 1.0).abs() < EPSILON);
+    }
+
+    #[test]
+    fn test_euler_angle() {
+        let q: Quaternion<f32> = euler_angles(PI, PI, PI);
+        // Should be a unit quaternion
+        assert!((square_len(q) - 1.0).abs() < EPSILON);
+    }
+
+    #[test]
+    fn test_rotate_vector_axis_angle() {
+        let v: Vector3<f32> = [1.0, 1.0, 1.0];
+        let q: Quaternion<f32> = axis_angle([0.0, 1.0, 0.0], PI);
+        let rotated = rotate_vector(q, v);
+        assert!((rotated[0] - -1.0).abs() < EPSILON);
+        assert!((rotated[1] - 1.0).abs() < EPSILON);
+        assert!((rotated[2] - -1.0).abs() < EPSILON);
+    }
+
+    #[test]
+    fn test_rotate_vector_euler_angle() {
+        let v: Vector3<f32> = [1.0, 1.0, 1.0];
+        let q: Quaternion<f32> = euler_angles(0.0, PI, 0.0);
+        let rotated = rotate_vector(q, v);
+        assert!((rotated[0] - -1.0).abs() < EPSILON);
+        assert!((rotated[1] - 1.0).abs() < EPSILON);
+        assert!((rotated[2] - -1.0).abs() < EPSILON);
+    }
+
+    /// Rotation on axis parallel to vector direction should have no effect
+    #[test]
+    fn test_rotate_vector_axis_angle_same_axis() {
+        use vecmath::vec3_normalized as normalized;
+
+        let v: Vector3<f32> = [1.0, 1.0, 1.0];
+        let arbitrary_angle = 32.12f32;
+        let axis: Vector3<f32> = [1.0, 1.0, 1.0];
+        let q: Quaternion<f32> = axis_angle(
+            normalized(axis),
+            arbitrary_angle
+        );
+        let rotated = rotate_vector(q, v);
+
+        assert!((rotated[0] - 1.0).abs() < EPSILON);
+        assert!((rotated[1] - 1.0).abs() < EPSILON);
+        assert!((rotated[2] - 1.0).abs() < EPSILON);
+    }
 }
-
-#[test]
-fn test_euler_angle() {
-    let q: Quaternion<f32> = euler_angles(
-        std::f32::consts::PI,
-        std::f32::consts::PI,
-        std::f32::consts::PI
-    );
-    // Should be a unit quaternion
-    assert!((square_len(q) - 1.0).abs() < EPSILON);
-}
-
-#[test]
-fn test_rotate_vector_axis_angle() {
-    let v: Vector3<f32> = [1.0, 1.0, 1.0];
-    let q: Quaternion<f32> = axis_angle([0.0, 1.0, 0.0], std::f32::consts::PI);
-    let rotated = rotate_vector(q, v);
-    assert!((rotated[0] - -1.0).abs() < EPSILON);
-    assert!((rotated[1] - 1.0).abs() < EPSILON);
-    assert!((rotated[2] - -1.0).abs() < EPSILON);
-}
-
-#[test]
-fn test_rotate_vector_euler_angle() {
-    let v: Vector3<f32> = [1.0, 1.0, 1.0];
-    let q: Quaternion<f32> = euler_angles(0.0, std::f32::consts::PI, 0.0);
-    let rotated = rotate_vector(q, v);
-    assert!((rotated[0] - -1.0).abs() < EPSILON);
-    assert!((rotated[1] - 1.0).abs() < EPSILON);
-    assert!((rotated[2] - -1.0).abs() < EPSILON);
-}
-
-/// Rotation on axis parallel to vector direction should have no effect
-#[test]
-fn test_rotate_vector_axis_angle_same_axis() {
-    use vecmath::vec3_normalized as normalized;
-
-    let v: Vector3<f32> = [1.0, 1.0, 1.0];
-    let arbitrary_angle = 32.12f32;
-    let axis: Vector3<f32> = [1.0, 1.0, 1.0];
-    let q: Quaternion<f32> = axis_angle(
-        normalized(axis),
-        arbitrary_angle
-    );
-    let rotated = rotate_vector(q, v);
-
-    assert!((rotated[0] - 1.0).abs() < EPSILON);
-    assert!((rotated[1] - 1.0).abs() < EPSILON);
-    assert!((rotated[2] - 1.0).abs() < EPSILON);
-}
-
