@@ -1,4 +1,5 @@
 #![deny(missing_docs)]
+#![feature(core, std_misc)]
 
 //! A simple and type agnostic quaternion math library designed for reexporting
 
