@@ -82,7 +82,7 @@ pub fn rotate_vector<T: Float>(q: Quaternion<T>, v: Vector3<T>) -> Vector3<T> {
 /// Construct a quaternion representing the given euler angle rotations (in radians)
 #[inline(always)]
 pub fn euler_angles<T: Float + FromPrimitive>(x: T, y: T, z: T) -> Quaternion<T> {
-    let two: T = FromPrimitive::from_int(2).unwrap();
+    let two: T = FromPrimitive::from_isize(2).unwrap();
 
     let half_x = x / two;
     let half_y = y / two;
@@ -112,7 +112,7 @@ pub fn euler_angles<T: Float + FromPrimitive>(x: T, y: T, z: T) -> Quaternion<T>
 #[inline(always)]
 pub fn axis_angle<T: Float + FromPrimitive>(axis: Vector3<T>, angle: T) -> Quaternion<T> {
     use vecmath::vec3_scale as scale;
-    let two: T = FromPrimitive::from_int(2).unwrap();
+    let two: T = FromPrimitive::from_isize(2).unwrap();
     let half_angle = angle / two;
     (half_angle.cos(), scale(axis, half_angle.sin()))
 }
