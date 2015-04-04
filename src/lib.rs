@@ -1,12 +1,12 @@
 #![deny(missing_docs)]
-#![feature(core, std_misc)]
 
 //! A simple and type agnostic quaternion math library designed for reexporting
 
 extern crate vecmath;
+extern crate num;
 
 use vecmath::Vector3;
-use std::num::{Float, FromPrimitive};
+use num::{ Float, FromPrimitive, Zero, One };
 
 /// Quaternion type alias.
 pub type Quaternion<T> = (T, [T; 3]);
@@ -14,8 +14,8 @@ pub type Quaternion<T> = (T, [T; 3]);
 /// Constructs identity quaternion.
 #[inline(always)]
 pub fn id<T: Float + Copy>() -> Quaternion<T> {
-    let one = Float::one();
-    let zero = Float::zero();
+    let one = One::one();
+    let zero = Zero::zero();
     (one, [zero, zero, zero])
 }
 
@@ -73,7 +73,7 @@ pub fn len<T: Float>(q: Quaternion<T>) -> T {
 /// Rotate the given vector using the given quaternion
 #[inline(always)]
 pub fn rotate_vector<T: Float>(q: Quaternion<T>, v: Vector3<T>) -> Vector3<T> {
-    let zero = Float::zero();
+    let zero = Zero::zero();
     let v_as_q : Quaternion<T> = (zero, v);
     let q_conj = conj(q);
     mul(mul(q, v_as_q), q_conj).1
