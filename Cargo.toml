@@ -22,4 +22,4 @@ git = "https://github.com/pistondevelopers/vecmath"
 #version = "0.0.5"
 
 [dependencies]
-num = "*"
+num = "0.1.21"
