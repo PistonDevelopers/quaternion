@@ -4,9 +4,10 @@
 //! A simple and type agnostic quaternion math library designed for reexporting
 
 extern crate vecmath;
+extern crate num;
 
 use vecmath::Vector3;
-use std::num::{Float, FromPrimitive};
+use num::{ Float, FromPrimitive };
 
 /// Quaternion type alias.
 pub type Quaternion<T> = (T, [T; 3]);
