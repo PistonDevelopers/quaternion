@@ -3,38 +3,44 @@
 //! A simple and type agnostic quaternion math library designed for reexporting
 
 extern crate vecmath;
-extern crate num;
 
 use vecmath::Vector3;
-use num::{ Float, FromPrimitive, Zero, One };
+use vecmath::traits::{ Zero, One, Sqrt, Trig };
+use std::ops::{ Add, Mul, Neg, Sub, Div };
 
 /// Quaternion type alias.
 pub type Quaternion<T> = (T, [T; 3]);
 
 /// Constructs identity quaternion.
 #[inline(always)]
-pub fn id<T: Float + Copy>() -> Quaternion<T> {
-    let one = One::one();
-    let zero = Zero::zero();
+pub fn id<T>() -> Quaternion<T>
+    where T: Copy + Zero + One
+{
+    let one = T::one();
+    let zero = T::zero();
     (one, [zero, zero, zero])
 }
 
 /// Adds two quaternions.
 #[inline(always)]
-pub fn add<T: Float>(
+pub fn add<T>(
     a: Quaternion<T>,
     b: Quaternion<T>
-) -> Quaternion<T> {
+) -> Quaternion<T>
+    where T: Copy + Add<T, Output = T>
+{
     use vecmath::vec3_add as add;
     (a.0 + b.0, add(a.1, b.1))
 }
 
 /// Multiplies two quaternions.
 #[inline(always)]
-pub fn mul<T: Float + Copy>(
+pub fn mul<T>(
     a: Quaternion<T>,
     b: Quaternion<T>
-) -> Quaternion<T> {
+) -> Quaternion<T>
+    where T: Copy + Mul<T, Output = T> + Sub<T, Output = T> + Add<T, Output = T>
+{
     use vecmath::vec3_cross as cross;
     use vecmath::vec3_add as add;
     use vecmath::vec3_dot as dot;
@@ -51,7 +57,9 @@ pub fn mul<T: Float + Copy>(
 
 /// Takes the quaternion conjugate.
 #[inline(always)]
-pub fn conj<T: Float>(a: Quaternion<T>) -> Quaternion<T> {
+pub fn conj<T>(a: Quaternion<T>) -> Quaternion<T>
+    where T: Copy + Neg<Output = T>
+{
     use vecmath::vec3_neg as neg;
 
     (a.0, neg(a.1))
@@ -59,20 +67,26 @@ pub fn conj<T: Float>(a: Quaternion<T>) -> Quaternion<T> {
 
 /// Computes the square length of a quaternion.
 #[inline(always)]
-pub fn square_len<T: Float>(q: Quaternion<T>) -> T {
+pub fn square_len<T>(q: Quaternion<T>) -> T
+    where T: Copy + Add<T, Output = T> + Mul<T, Output = T>
+{
     use vecmath::vec3_square_len as square_len;
     q.0 * q.0 + square_len(q.1)
 }
 
 /// Computes the length of a quaternion.
 #[inline(always)]
-pub fn len<T: Float>(q: Quaternion<T>) -> T {
+pub fn len<T>(q: Quaternion<T>) -> T
+    where T: Copy + Sqrt + Add<T, Output = T> + Mul<T, Output = T>
+{
     square_len(q).sqrt()
 }
 
 /// Rotate the given vector using the given quaternion
 #[inline(always)]
-pub fn rotate_vector<T: Float>(q: Quaternion<T>, v: Vector3<T>) -> Vector3<T> {
+pub fn rotate_vector<T>(q: Quaternion<T>, v: Vector3<T>) -> Vector3<T>
+    where T: Copy + Zero + Neg<Output = T> + Mul<T, Output = T> + Sub<T, Output = T> + Add<T, Output = T>
+{
     let zero = Zero::zero();
     let v_as_q : Quaternion<T> = (zero, v);
     let q_conj = conj(q);
@@ -81,8 +95,10 @@ pub fn rotate_vector<T: Float>(q: Quaternion<T>, v: Vector3<T>) -> Vector3<T> {
 
 /// Construct a quaternion representing the given euler angle rotations (in radians)
 #[inline(always)]
-pub fn euler_angles<T: Float + FromPrimitive>(x: T, y: T, z: T) -> Quaternion<T> {
-    let two: T = FromPrimitive::from_isize(2).unwrap();
+pub fn euler_angles<T>(x: T, y: T, z: T) -> Quaternion<T>
+    where T: Copy + One + Mul<T, Output = T> + Add<T, Output = T> + Div<T, Output = T> + Trig
+{
+    let two: T = T::one() + T::one();
 
     let half_x = x / two;
     let half_y = y / two;
@@ -110,9 +126,11 @@ pub fn euler_angles<T: Float + FromPrimitive>(x: T, y: T, z: T) -> Quaternion<T>
 /// about the given axis.
 /// Axis must be a unit vector.
 #[inline(always)]
-pub fn axis_angle<T: Float + FromPrimitive>(axis: Vector3<T>, angle: T) -> Quaternion<T> {
+pub fn axis_angle<T>(axis: Vector3<T>, angle: T) -> Quaternion<T>
+    where T: Copy + One + Mul<T, Output = T> + Add<T, Output = T> + Div<T, Output = T> + Trig
+{
     use vecmath::vec3_scale as scale;
-    let two: T = FromPrimitive::from_isize(2).unwrap();
+    let two: T = T::one() + T::one();
     let half_angle = angle / two;
     (half_angle.cos(), scale(axis, half_angle.sin()))
 }
@@ -124,7 +142,6 @@ mod test {
     use super::*;
     use vecmath::Vector3;
     use std::f32::consts::PI;
-    use std::num::Float;
 
     /// Fudge factor for float equality checks
     static EPSILON: f32 = 0.000001;
