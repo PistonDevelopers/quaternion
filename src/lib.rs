@@ -5,8 +5,7 @@
 extern crate vecmath;
 
 use vecmath::Vector3;
-use vecmath::traits::{ Zero, One, Sqrt, Trig };
-use std::ops::{ Add, Mul, Neg, Sub, Div };
+use vecmath::traits::Float;
 
 /// Quaternion type alias.
 pub type Quaternion<T> = (T, [T; 3]);
@@ -14,7 +13,7 @@ pub type Quaternion<T> = (T, [T; 3]);
 /// Constructs identity quaternion.
 #[inline(always)]
 pub fn id<T>() -> Quaternion<T>
-    where T: Copy + Zero + One
+    where T: Float
 {
     let one = T::one();
     let zero = T::zero();
@@ -27,7 +26,7 @@ pub fn add<T>(
     a: Quaternion<T>,
     b: Quaternion<T>
 ) -> Quaternion<T>
-    where T: Copy + Add<T, Output = T>
+    where T: Float
 {
     use vecmath::vec3_add as add;
     (a.0 + b.0, add(a.1, b.1))
@@ -39,7 +38,7 @@ pub fn mul<T>(
     a: Quaternion<T>,
     b: Quaternion<T>
 ) -> Quaternion<T>
-    where T: Copy + Mul<T, Output = T> + Sub<T, Output = T> + Add<T, Output = T>
+    where T: Float
 {
     use vecmath::vec3_cross as cross;
     use vecmath::vec3_add as add;
@@ -58,7 +57,7 @@ pub fn mul<T>(
 /// Takes the quaternion conjugate.
 #[inline(always)]
 pub fn conj<T>(a: Quaternion<T>) -> Quaternion<T>
-    where T: Copy + Neg<Output = T>
+    where T: Float
 {
     use vecmath::vec3_neg as neg;
 
@@ -68,7 +67,7 @@ pub fn conj<T>(a: Quaternion<T>) -> Quaternion<T>
 /// Computes the square length of a quaternion.
 #[inline(always)]
 pub fn square_len<T>(q: Quaternion<T>) -> T
-    where T: Copy + Add<T, Output = T> + Mul<T, Output = T>
+    where T: Float
 {
     use vecmath::vec3_square_len as square_len;
     q.0 * q.0 + square_len(q.1)
@@ -77,7 +76,7 @@ pub fn square_len<T>(q: Quaternion<T>) -> T
 /// Computes the length of a quaternion.
 #[inline(always)]
 pub fn len<T>(q: Quaternion<T>) -> T
-    where T: Copy + Sqrt + Add<T, Output = T> + Mul<T, Output = T>
+    where T: Float
 {
     square_len(q).sqrt()
 }
@@ -85,9 +84,9 @@ pub fn len<T>(q: Quaternion<T>) -> T
 /// Rotate the given vector using the given quaternion
 #[inline(always)]
 pub fn rotate_vector<T>(q: Quaternion<T>, v: Vector3<T>) -> Vector3<T>
-    where T: Copy + Zero + Neg<Output = T> + Mul<T, Output = T> + Sub<T, Output = T> + Add<T, Output = T>
+    where T: Float
 {
-    let zero = Zero::zero();
+    let zero = T::zero();
     let v_as_q : Quaternion<T> = (zero, v);
     let q_conj = conj(q);
     mul(mul(q, v_as_q), q_conj).1
@@ -96,7 +95,7 @@ pub fn rotate_vector<T>(q: Quaternion<T>, v: Vector3<T>) -> Vector3<T>
 /// Construct a quaternion representing the given euler angle rotations (in radians)
 #[inline(always)]
 pub fn euler_angles<T>(x: T, y: T, z: T) -> Quaternion<T>
-    where T: Copy + One + Mul<T, Output = T> + Add<T, Output = T> + Div<T, Output = T> + Trig
+    where T: Float
 {
     let two: T = T::one() + T::one();
 
@@ -127,7 +126,7 @@ pub fn euler_angles<T>(x: T, y: T, z: T) -> Quaternion<T>
 /// Axis must be a unit vector.
 #[inline(always)]
 pub fn axis_angle<T>(axis: Vector3<T>, angle: T) -> Quaternion<T>
-    where T: Copy + One + Mul<T, Output = T> + Add<T, Output = T> + Div<T, Output = T> + Trig
+    where T: Float
 {
     use vecmath::vec3_scale as scale;
     let two: T = T::one() + T::one();
