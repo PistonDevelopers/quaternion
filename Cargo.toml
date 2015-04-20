@@ -20,6 +20,3 @@ path = "src/lib.rs"
 [dependencies.vecmath]
 git = "https://github.com/pistondevelopers/vecmath"
 #version = "0.0.5"
-
-[dependencies]
-num = "0.1.21"
