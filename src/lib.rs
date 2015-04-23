@@ -44,6 +44,17 @@ pub fn scale<T>(
     (q.0 * t, scale(q.1, t))
 }
 
+/// Dot product of two quaternions
+#[inline(always)]
+pub fn dot<T>(
+    a: Quaternion<T>,
+    b: Quaternion<T>
+) -> T
+    where T: Float
+{
+    a.0 * b.0 + vecmath::vec3_dot(a.1, b.1)
+}
+
 /// Multiplies two quaternions.
 #[inline(always)]
 pub fn mul<T>(
