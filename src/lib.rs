@@ -32,6 +32,18 @@ pub fn add<T>(
     (a.0 + b.0, add(a.1, b.1))
 }
 
+/// Scales a quaternion (element-wise) by a scalar
+#[inline(always)]
+pub fn scale<T>(
+    q: Quaternion<T>,
+    t: T
+) -> Quaternion<T>
+    where T: Float
+{
+    use vecmath::vec3_scale as scale;
+    (q.0 * t, scale(q.1, t))
+}
+
 /// Multiplies two quaternions.
 #[inline(always)]
 pub fn mul<T>(
