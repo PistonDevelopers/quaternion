@@ -115,6 +115,43 @@ pub fn rotate_vector<T>(q: Quaternion<T>, v: Vector3<T>) -> Vector3<T>
     mul(mul(q, v_as_q), q_conj).1
 }
 
+/// Construct a quaternion representing the rotation from a to b
+#[inline(always)]
+pub fn rotation_from_to<T>(a: Vector3<T>, b: Vector3<T>) -> Quaternion<T>
+    where T: Float
+{
+    use vecmath::{vec3_cross, vec3_dot, vec3_square_len, vec3_normalized};
+    use std::f64::consts::PI;
+
+    let _1 = T::one();
+    let _0 = T::zero();
+
+    let a = vec3_normalized(a);
+    let b = vec3_normalized(b);
+    let dot = vec3_dot(a, b);
+
+    if dot >= _1 {
+        // a, b are parallel
+        return id();
+    }
+
+    if dot < T::from_f64(-0.999999) {
+        // a, b are anti-parallel
+        let mut axis = vec3_cross([_1, _0, _0], a);
+        if vec3_square_len(axis) == _0 {
+            axis = vec3_cross([_0, _1, _0], a);
+        }
+        axis = vec3_normalized(axis);
+        axis_angle(axis, T::from_f64(PI))
+    } else {
+        let q = (
+            _1 + dot,
+            vec3_cross(a, b)
+        );
+        scale(q, _1 / len(q))
+    }
+}
+
 /// Construct a quaternion representing the given euler angle rotations (in radians)
 #[inline(always)]
 pub fn euler_angles<T>(x: T, y: T, z: T) -> Quaternion<T>
@@ -226,4 +263,59 @@ mod test {
         assert!((rotated[1] - 1.0).abs() < EPSILON);
         assert!((rotated[2] - 1.0).abs() < EPSILON);
     }
+
+    #[test]
+    fn test_rotation_from_to_1() {
+        use vecmath::vec3_normalized as normalized;
+
+        let a: Vector3<f32> = [1.0, 1.0, 1.0];
+        let b: Vector3<f32> = [-1.0, -1.0, -1.0];
+
+        let q = super::rotation_from_to(a, b);
+
+        let a_prime = super::rotate_vector(q, a);
+
+        println!("a_prime = {:?}", a_prime);
+
+        assert!((a_prime[0] + 1.0).abs() < EPSILON);
+        assert!((a_prime[1] + 1.0).abs() < EPSILON);
+        assert!((a_prime[2] + 1.0).abs() < EPSILON);
+    }
+
+    #[test]
+    fn test_rotation_from_to_2() {
+        use vecmath;
+        use vecmath::vec3_normalized as normalized;
+
+        let a: Vector3<f32> = normalized([1.0, 1.0, 0.0]);
+        let b: Vector3<f32> = [0.0, 1.0, 0.0];
+
+        let q = super::rotation_from_to(a, b);
+        let a_prime = super::rotate_vector(q, a);
+
+        println!("a_prime = {:?}", a_prime);
+
+        assert!((a_prime[0] - 0.0).abs() < EPSILON);
+        assert!((a_prime[1] - 1.0).abs() < EPSILON);
+        assert!((a_prime[2] - 0.0).abs() < EPSILON);
+    }
+
+    #[test]
+    fn test_rotation_from_to_3() {
+        use vecmath::vec3_normalized as normalized;
+
+        let a: Vector3<f32> = [1.0, 0.0, 0.0];
+        let b: Vector3<f32> = [0.0, -1.0, 0.0];
+
+        let q = super::rotation_from_to(a, b);
+
+        let a_prime = super::rotate_vector(q, a);
+
+        println!("a_prime = {:?}", a_prime);
+
+        assert!((a_prime[0] - 0.0).abs() < EPSILON);
+        assert!((a_prime[1] - -1.0).abs() < EPSILON);
+        assert!((a_prime[2] - 0.0).abs() < EPSILON);
+    }
+
 }
