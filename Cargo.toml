@@ -1,9 +1,10 @@
 [package]
 
 name = "quaternion"
-version = "0.0.7"
+version = "0.1.0"
 authors = [
-    "bvssvni <bvssvni@gmail.com>"
+    "bvssvni <bvssvni@gmail.com>",
+    "Steve Jahns <s.t.jahns@gmail.com>"
 ]
 keywords = ["quaternion", "math", "piston"]
 description = "A simple and type agnostic quaternion math library designed for reexporting"
@@ -18,4 +19,4 @@ name = "quaternion"
 path = "src/lib.rs"
 
 [dependencies]
-vecmath = "0.0.23"
+vecmath = "0.1.0"
