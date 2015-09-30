@@ -266,8 +266,6 @@ mod test {
 
     #[test]
     fn test_rotation_from_to_1() {
-        use vecmath::vec3_normalized as normalized;
-
         let a: Vector3<f32> = [1.0, 1.0, 1.0];
         let b: Vector3<f32> = [-1.0, -1.0, -1.0];
 
@@ -284,7 +282,6 @@ mod test {
 
     #[test]
     fn test_rotation_from_to_2() {
-        use vecmath;
         use vecmath::vec3_normalized as normalized;
 
         let a: Vector3<f32> = normalized([1.0, 1.0, 0.0]);
@@ -302,8 +299,6 @@ mod test {
 
     #[test]
     fn test_rotation_from_to_3() {
-        use vecmath::vec3_normalized as normalized;
-
         let a: Vector3<f32> = [1.0, 0.0, 0.0];
         let b: Vector3<f32> = [0.0, -1.0, 0.0];
 
