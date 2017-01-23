@@ -1,7 +1,7 @@
 [package]
 
 name = "quaternion"
-version = "0.2.1"
+version = "0.3.0"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Steve Jahns <s.t.jahns@gmail.com>"
@@ -19,4 +19,4 @@ name = "quaternion"
 path = "src/lib.rs"
 
 [dependencies]
-vecmath = "0.2.0"
+vecmath = "0.3.0"
