@@ -1,11 +1,12 @@
+#![feature(test)]
 #![deny(missing_docs)]
 
 //! A simple and type agnostic quaternion math library designed for reexporting
 
 extern crate vecmath;
 
-use vecmath::Vector3;
 use vecmath::traits::Float;
+use vecmath::Vector3;
 
 /// Quaternion type alias.
 pub type Quaternion<T> = (T, [T; 3]);
@@ -13,7 +14,8 @@ pub type Quaternion<T> = (T, [T; 3]);
 /// Constructs identity quaternion.
 #[inline(always)]
 pub fn id<T>() -> Quaternion<T>
-    where T: Float
+where
+    T: Float,
 {
     let one = T::one();
     let zero = T::zero();
@@ -22,11 +24,9 @@ pub fn id<T>() -> Quaternion<T>
 
 /// Adds two quaternions.
 #[inline(always)]
-pub fn add<T>(
-    a: Quaternion<T>,
-    b: Quaternion<T>
-) -> Quaternion<T>
-    where T: Float
+pub fn add<T>(a: Quaternion<T>, b: Quaternion<T>) -> Quaternion<T>
+where
+    T: Float,
 {
     use vecmath::vec3_add as add;
     (a.0 + b.0, add(a.1, b.1))
@@ -34,11 +34,9 @@ pub fn add<T>(
 
 /// Scales a quaternion (element-wise) by a scalar
 #[inline(always)]
-pub fn scale<T>(
-    q: Quaternion<T>,
-    t: T
-) -> Quaternion<T>
-    where T: Float
+pub fn scale<T>(q: Quaternion<T>, t: T) -> Quaternion<T>
+where
+    T: Float,
 {
     use vecmath::vec3_scale as scale;
     (q.0 * t, scale(q.1, t))
@@ -46,41 +44,35 @@ pub fn scale<T>(
 
 /// Dot product of two quaternions
 #[inline(always)]
-pub fn dot<T>(
-    a: Quaternion<T>,
-    b: Quaternion<T>
-) -> T
-    where T: Float
+pub fn dot<T>(a: Quaternion<T>, b: Quaternion<T>) -> T
+where
+    T: Float,
 {
     a.0 * b.0 + vecmath::vec3_dot(a.1, b.1)
 }
 
 /// Multiplies two quaternions.
 #[inline(always)]
-pub fn mul<T>(
-    a: Quaternion<T>,
-    b: Quaternion<T>
-) -> Quaternion<T>
-    where T: Float
+pub fn mul<T>(a: Quaternion<T>, b: Quaternion<T>) -> Quaternion<T>
+where
+    T: Float,
 {
-    use vecmath::vec3_cross as cross;
     use vecmath::vec3_add as add;
+    use vecmath::vec3_cross as cross;
     use vecmath::vec3_dot as dot;
     use vecmath::vec3_scale as scale;
 
     (
         a.0 * b.0 - dot(a.1, b.1),
-        add(
-            add(scale(b.1, a.0), scale(a.1, b.0)),
-            cross(a.1, b.1)
-        )
+        add(add(scale(b.1, a.0), scale(a.1, b.0)), cross(a.1, b.1)),
     )
 }
 
 /// Takes the quaternion conjugate.
 #[inline(always)]
 pub fn conj<T>(a: Quaternion<T>) -> Quaternion<T>
-    where T: Float
+where
+    T: Float,
 {
     use vecmath::vec3_neg as neg;
 
@@ -90,7 +82,8 @@ pub fn conj<T>(a: Quaternion<T>) -> Quaternion<T>
 /// Computes the square length of a quaternion.
 #[inline(always)]
 pub fn square_len<T>(q: Quaternion<T>) -> T
-    where T: Float
+where
+    T: Float,
 {
     use vecmath::vec3_square_len as square_len;
     q.0 * q.0 + square_len(q.1)
@@ -99,7 +92,8 @@ pub fn square_len<T>(q: Quaternion<T>) -> T
 /// Computes the length of a quaternion.
 #[inline(always)]
 pub fn len<T>(q: Quaternion<T>) -> T
-    where T: Float
+where
+    T: Float,
 {
     square_len(q).sqrt()
 }
@@ -107,21 +101,36 @@ pub fn len<T>(q: Quaternion<T>) -> T
 /// Rotate the given vector using the given quaternion
 #[inline(always)]
 pub fn rotate_vector<T>(q: Quaternion<T>, v: Vector3<T>) -> Vector3<T>
-    where T: Float
+where
+    T: Float,
 {
     let zero = T::zero();
-    let v_as_q : Quaternion<T> = (zero, v);
+    let v_as_q: Quaternion<T> = (zero, v);
     let q_conj = conj(q);
     mul(mul(q, v_as_q), q_conj).1
+}
+
+/// Rotate the given vector using the given quaternion
+/// (alternative method)
+#[inline(always)]
+pub fn rotate_vector_cmp<T>(q: Quaternion<T>, v: Vector3<T>) -> Vector3<T>
+where
+    T: Float,
+{
+    use vecmath::{vec3_add as add, vec3_cross as cross, vec3_scale as scale};
+    let two = T::one() + T::one();
+    let t: Vector3<T> = scale(cross(q.1, v), two);
+    add(add(v, scale(t, q.0)), cross(q.1, t))
 }
 
 /// Construct a quaternion representing the rotation from a to b
 #[inline(always)]
 pub fn rotation_from_to<T>(a: Vector3<T>, b: Vector3<T>) -> Quaternion<T>
-    where T: Float
+where
+    T: Float,
 {
-    use vecmath::{vec3_cross, vec3_dot, vec3_square_len, vec3_normalized};
     use std::f64::consts::PI;
+    use vecmath::{vec3_cross, vec3_dot, vec3_normalized, vec3_square_len};
 
     let _1 = T::one();
     let _0 = T::zero();
@@ -144,10 +153,7 @@ pub fn rotation_from_to<T>(a: Vector3<T>, b: Vector3<T>) -> Quaternion<T>
         axis = vec3_normalized(axis);
         axis_angle(axis, T::from_f64(PI))
     } else {
-        let q = (
-            _1 + dot,
-            vec3_cross(a, b)
-        );
+        let q = (_1 + dot, vec3_cross(a, b));
         scale(q, _1 / len(q))
     }
 }
@@ -155,7 +161,8 @@ pub fn rotation_from_to<T>(a: Vector3<T>, b: Vector3<T>) -> Quaternion<T>
 /// Construct a quaternion representing the given euler angle rotations (in radians)
 #[inline(always)]
 pub fn euler_angles<T>(x: T, y: T, z: T) -> Quaternion<T>
-    where T: Float
+where
+    T: Float,
 {
     let two: T = T::one() + T::one();
 
@@ -176,17 +183,17 @@ pub fn euler_angles<T>(x: T, y: T, z: T) -> Quaternion<T>
         [
             sin_x_2 * cos_y_2 * cos_z_2 + cos_x_2 * sin_y_2 * sin_z_2,
             cos_x_2 * sin_y_2 * cos_z_2 + sin_x_2 * cos_y_2 * sin_z_2,
-            cos_x_2 * cos_y_2 * sin_z_2 + sin_x_2 * sin_y_2 * cos_z_2
-        ]
+            cos_x_2 * cos_y_2 * sin_z_2 + sin_x_2 * sin_y_2 * cos_z_2,
+        ],
     )
 }
-
 /// Construct a quaternion for the given angle (in radians)
 /// about the given axis.
 /// Axis must be a unit vector.
 #[inline(always)]
 pub fn axis_angle<T>(axis: Vector3<T>, angle: T) -> Quaternion<T>
-    where T: Float
+where
+    T: Float,
 {
     use vecmath::vec3_scale as scale;
     let two: T = T::one() + T::one();
@@ -194,13 +201,14 @@ pub fn axis_angle<T>(axis: Vector3<T>, angle: T) -> Quaternion<T>
     (half_angle.cos(), scale(axis, half_angle.sin()))
 }
 
-
+extern crate test;
 /// Tests
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
-    use vecmath::Vector3;
     use std::f32::consts::PI;
+    use vecmath::Vector3;
+    use test::Bencher;
 
     /// Fudge factor for float equality checks
     static EPSILON: f32 = 0.000001;
@@ -209,10 +217,7 @@ mod test {
     fn test_axis_angle() {
         use vecmath::vec3_normalized as normalized;
         let axis: Vector3<f32> = [1.0, 1.0, 1.0];
-        let q: Quaternion<f32> = axis_angle(
-            normalized(axis),
-            PI
-        );
+        let q: Quaternion<f32> = axis_angle(normalized(axis), PI);
 
         // Should be a unit quaternion
         assert!((square_len(q) - 1.0).abs() < EPSILON);
@@ -236,6 +241,16 @@ mod test {
     }
 
     #[test]
+    fn test_rotate_vector_axis_angle_cmp() {
+        let v: Vector3<f32> = [1.0, 1.0, 1.0];
+        let q: Quaternion<f32> = axis_angle([0.0, 1.0, 0.0], PI);
+        let rotated = rotate_vector_cmp(q, v);
+        assert!((rotated[0] - -1.0).abs() < EPSILON);
+        assert!((rotated[1] - 1.0).abs() < EPSILON);
+        assert!((rotated[2] - -1.0).abs() < EPSILON);
+    }
+
+    #[test]
     fn test_rotate_vector_euler_angle() {
         let v: Vector3<f32> = [1.0, 1.0, 1.0];
         let q: Quaternion<f32> = euler_angles(0.0, PI, 0.0);
@@ -253,10 +268,7 @@ mod test {
         let v: Vector3<f32> = [1.0, 1.0, 1.0];
         let arbitrary_angle = 32.12f32;
         let axis: Vector3<f32> = [1.0, 1.0, 1.0];
-        let q: Quaternion<f32> = axis_angle(
-            normalized(axis),
-            arbitrary_angle
-        );
+        let q: Quaternion<f32> = axis_angle(normalized(axis), arbitrary_angle);
         let rotated = rotate_vector(q, v);
 
         assert!((rotated[0] - 1.0).abs() < EPSILON);
@@ -311,6 +323,20 @@ mod test {
         assert!((a_prime[0] - 0.0).abs() < EPSILON);
         assert!((a_prime[1] - -1.0).abs() < EPSILON);
         assert!((a_prime[2] - 0.0).abs() < EPSILON);
+    }
+
+    #[bench]
+    fn bench_rotate_vector(b: &mut Bencher) {
+        let v: Vector3<f32> = [1.0, 1.0, 1.0];
+        let q: Quaternion<f32> = axis_angle([0.0, 1.0, 0.0], PI);
+        b.iter(|| rotate_vector(q, v));
+    }
+
+    #[bench]
+    fn bench_rotate_vector_cmp(b: &mut Bencher) {
+        let v: Vector3<f32> = [1.0, 1.0, 1.0];
+        let q: Quaternion<f32> = axis_angle([0.0, 1.0, 0.0], PI);
+        b.iter(|| rotate_vector_cmp(q, v));
     }
 
 }
