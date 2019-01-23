@@ -1,4 +1,3 @@
-#![feature(test)]
 #![deny(missing_docs)]
 
 //! A simple and type agnostic quaternion math library designed for reexporting
@@ -104,19 +103,6 @@ pub fn rotate_vector<T>(q: Quaternion<T>, v: Vector3<T>) -> Vector3<T>
 where
     T: Float,
 {
-    let zero = T::zero();
-    let v_as_q: Quaternion<T> = (zero, v);
-    let q_conj = conj(q);
-    mul(mul(q, v_as_q), q_conj).1
-}
-
-/// Rotate the given vector using the given quaternion
-/// (alternative method)
-#[inline(always)]
-pub fn rotate_vector_cmp<T>(q: Quaternion<T>, v: Vector3<T>) -> Vector3<T>
-where
-    T: Float,
-{
     use vecmath::{vec3_add as add, vec3_cross as cross, vec3_scale as scale};
     let two = T::one() + T::one();
     let t: Vector3<T> = scale(cross(q.1, v), two);
@@ -201,14 +187,12 @@ where
     (half_angle.cos(), scale(axis, half_angle.sin()))
 }
 
-extern crate test;
 /// Tests
 #[cfg(test)]
-mod tests {
+mod test {
     use super::*;
     use std::f32::consts::PI;
     use vecmath::Vector3;
-    use test::Bencher;
 
     /// Fudge factor for float equality checks
     static EPSILON: f32 = 0.000001;
@@ -235,16 +219,6 @@ mod tests {
         let v: Vector3<f32> = [1.0, 1.0, 1.0];
         let q: Quaternion<f32> = axis_angle([0.0, 1.0, 0.0], PI);
         let rotated = rotate_vector(q, v);
-        assert!((rotated[0] - -1.0).abs() < EPSILON);
-        assert!((rotated[1] - 1.0).abs() < EPSILON);
-        assert!((rotated[2] - -1.0).abs() < EPSILON);
-    }
-
-    #[test]
-    fn test_rotate_vector_axis_angle_cmp() {
-        let v: Vector3<f32> = [1.0, 1.0, 1.0];
-        let q: Quaternion<f32> = axis_angle([0.0, 1.0, 0.0], PI);
-        let rotated = rotate_vector_cmp(q, v);
         assert!((rotated[0] - -1.0).abs() < EPSILON);
         assert!((rotated[1] - 1.0).abs() < EPSILON);
         assert!((rotated[2] - -1.0).abs() < EPSILON);
@@ -324,19 +298,4 @@ mod tests {
         assert!((a_prime[1] - -1.0).abs() < EPSILON);
         assert!((a_prime[2] - 0.0).abs() < EPSILON);
     }
-
-    #[bench]
-    fn bench_rotate_vector(b: &mut Bencher) {
-        let v: Vector3<f32> = [1.0, 1.0, 1.0];
-        let q: Quaternion<f32> = axis_angle([0.0, 1.0, 0.0], PI);
-        b.iter(|| rotate_vector(q, v));
-    }
-
-    #[bench]
-    fn bench_rotate_vector_cmp(b: &mut Bencher) {
-        let v: Vector3<f32> = [1.0, 1.0, 1.0];
-        let q: Quaternion<f32> = axis_angle([0.0, 1.0, 0.0], PI);
-        b.iter(|| rotate_vector_cmp(q, v));
-    }
-
 }
