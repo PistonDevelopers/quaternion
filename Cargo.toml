@@ -4,7 +4,8 @@ name = "quaternion"
 version = "0.3.0"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
-    "Steve Jahns <s.t.jahns@gmail.com>"
+    "Steve Jahns <s.t.jahns@gmail.com>",
+    "Red Hara <hara@protonmail.ch>"
 ]
 keywords = ["quaternion", "math", "piston"]
 description = "A simple and type agnostic quaternion math library designed for reexporting"
