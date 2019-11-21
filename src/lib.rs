@@ -115,8 +115,9 @@ pub fn rotation_from_to<T>(a: Vector3<T>, b: Vector3<T>) -> Quaternion<T>
 where
     T: Float,
 {
-    use std::f64::consts::PI;
     use vecmath::{vec3_cross, vec3_dot, vec3_normalized, vec3_square_len};
+
+    const PI: f64 = 3.14159265358979323846264338327950288_f64;
 
     let _1 = T::one();
     let _0 = T::zero();
@@ -191,11 +192,11 @@ where
 #[cfg(test)]
 mod test {
     use super::*;
-    use std::f32::consts::PI;
     use vecmath::Vector3;
 
     /// Fudge factor for float equality checks
     static EPSILON: f32 = 0.000001;
+    static PI: f32 = 3.14159265358979323846264338327950288_f32;
 
     #[test]
     fn test_axis_angle() {
