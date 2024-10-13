@@ -168,9 +168,9 @@ where
     (
         cos_x_2 * cos_y_2 * cos_z_2 + sin_x_2 * sin_y_2 * sin_z_2,
         [
-            sin_x_2 * cos_y_2 * cos_z_2 + cos_x_2 * sin_y_2 * sin_z_2,
+            sin_x_2 * cos_y_2 * cos_z_2 - cos_x_2 * sin_y_2 * sin_z_2,
             cos_x_2 * sin_y_2 * cos_z_2 + sin_x_2 * cos_y_2 * sin_z_2,
-            cos_x_2 * cos_y_2 * sin_z_2 + sin_x_2 * sin_y_2 * cos_z_2,
+            cos_x_2 * cos_y_2 * sin_z_2 - sin_x_2 * sin_y_2 * cos_z_2,
         ],
     )
 }
